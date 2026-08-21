@@ -1,0 +1,94 @@
+# Project TODO
+
+- [x] Define shared TypeScript domain models for city graph nodes, roads, facility types, epidemiological parameters, intervention budgets, scenario snapshots, strategy outcomes, Bayesian scores, recommendations, and reports.
+- [x] Add database schema and persistence helpers for saved scenarios and shareable reports, including unique public share identifiers.
+- [x] Create a global application shell with accessible navigation, responsive layout, light/dark theme switching, reduced-motion support, and intentional transition tokens.
+- [x] Build the synthetic city graph generator with homes, schools, hospitals, offices, blocks, road edges, edge distances, and configurable transmission probabilities.
+- [x] Add caller-configurable minimum and maximum road transmission probabilities to the synthetic city generator and prove them with unit tests.
+- [x] Render the synthetic graph with zoom, pan, facility legend, road weights, selected-node state, and meaningful empty/loading/error states.
+- [x] Implement a discrete-time SIR simulator with configurable infection rate, recovery rate, mortality rate, initial infected nodes, fixed simulation duration, reproducible random seed, and per-step snapshots.
+- [x] Preserve transmission connectivity between population locations joined by zero-population road intersections, and verify that constrained strategies can produce distinguishable controlled outcomes.
+- [x] Calibrate the network transmission force so default reproducible scenarios exhibit meaningful spread and intervention-strategy differences without abandoning transparent discrete-time assumptions.
+- [x] Add deterministic comparison coverage proving the default scenario produces non-trivial spread and measurable differences between budget-constrained strategy outcomes.
+- [x] Verify that the dashboard’s default scenario uses the calibrated engine and visibly surfaces distinguishable strategy metrics.
+- [x] Implement intervention-budget validation for maximum closed roads, maximum quarantined buildings or blocks, and maximum affected population.
+- [x] Implement the Random intervention strategy with deterministic seeded selection under the active intervention budget.
+- [x] Implement the Highest-Degree intervention strategy under the active intervention budget.
+- [x] Implement the Betweenness Centrality intervention strategy under the active intervention budget.
+- [x] Implement the Dijkstra shortest-path blocking strategy under the active intervention budget.
+- [x] Implement the Max-Flow Min-Cut intervention strategy under the active intervention budget.
+- [x] Ensure all five intervention strategies run from strictly identical graph snapshots, epidemiological parameters, starting infections, random seed, duration, and budget constraints.
+- [x] Calculate outcome metrics for every strategy, including infections over time, active cases, recoveries, deaths, peak infections, final infections, mortality projection, selected roads or nodes, and budget usage.
+- [x] Add Bayesian hotspot scoring that updates location risk from prior infection probability, neighboring states, and observed symptom evidence.
+- [x] Generate ranked quarantine and road-closure recommendations that state the target, action, rationale, expected impact, and budget cost.
+- [x] Add an OpenStreetMap city-road importer through a server-side public-data integration, with city selection, network size guardrails, error handling, road-to-graph conversion, and graph normalization.
+- [x] Allow imported real-city road networks to run through the same SIR, budget, and five-strategy comparison pipeline as synthetic graphs.
+- [x] Build an animated epidemic timeline with step controls, play/pause, scrubber, animated state changes, intervention highlights, legends, and color-blind-conscious state colors.
+- [x] Build the scenario workspace with controls for city source, graph settings, epidemic rates, initial infections, intervention budget, evidence inputs, and strategy comparison launch.
+- [x] Build comparison charts and tables for infection, active cases, recoveries, deaths, mortality projections, peak metrics, budget use, and implementation recommendations.
+- [x] Add explicit global reduced-motion handling and verify that non-essential dashboard motion can be disabled by user preference.
+- [x] Add a graph loading state and an import-error state that remain visible in the workspace rather than relying only on transient notifications.
+- [x] Add explicit timeline previous-day and next-day controls beside the visible day scrubber, then verify the control behavior.
+- [x] Surface recoveries and mortality projections in the comparison interface alongside active infections, cases, deaths, peak metrics, budgets, and recommendations.
+- [x] Build the decision-maker recommendations view with plain-language priority actions and supporting mathematical evidence.
+- [x] Integrate a server-side LLM explanation generator that summarizes the winning strategy in accessible plain English and identifies the critical nodes or edges without presenting medical advice as real-world guidance.
+- [x] Add report persistence with a public share page that displays the graph snapshot, scenario configuration, selected interventions, outcome charts, recommendations, and LLM explanation.
+- [x] Add a downloadable PDF report containing the graph snapshot, scenario configuration, intervention choices, outcome charts, recommendation summary, and LLM explanation.
+- [x] Write unit tests for graph generation, SIR state transitions, budget enforcement, strategy fairness, Bayesian scoring, recommendation generation, and report/share-link behavior.
+- [x] Verify the desktop dashboard layout, light and dark contrast, core keyboard usability, and reduced-motion behavior; mobile-specific adaptation is out of scope.
+- [x] Document the mathematical assumptions, algorithm definitions, experimental protocol, limitations, real-city data handling, and results for the academic report.
+- [x] Prepare final screenshots, demonstration scenarios, presentation evidence, and implementation guide.
+- [x] Document the desktop-first support boundary and the decision to de-prioritize mobile-specific and specialized assistive-technology enhancements for this academic demonstration.
+- [x] Verify the public share page renders each required report section from a persisted payload, including graph snapshot, configuration, interventions, charts, recommendations, and LLM explanation.
+- [x] Verify the PDF export target contains all required report sections and add basic export-failure feedback.
+- [x] Add direct assertions that generated recommendations include target, action, rationale, expected impact, and budget cost.
+- [x] Limit real-city imports to a selected neighborhood-scale bounding area with a configurable network-size cap so live comparisons remain responsive.
+- [x] Cache normalized OpenStreetMap import results by city-area query and gracefully report public-data rate limits, timeouts, and oversized-network errors.
+- [x] Add bounded failover across multiple public Overpass endpoints and verify the real-city importer returns a normalized live road graph when the primary provider is unavailable.
+- [x] Add an official OpenStreetMap small-area map-data fallback for the same bounded road query and document the fallback provenance in the academic data-source notes.
+- [x] Clip imported OSM way geometry to the requested neighborhood radius before applying the graph-size safeguard, then validate a successful bounded live import.
+- [x] Keep all real-city simulation, intervention analysis, explanation, report sharing, and PDF export inside the managed full-stack application without a separate compute service.
+- [x] Detect oversized OpenStreetMap networks before normalization, return a specific actionable import error, and cover that response with unit tests.
+- [x] Implement and verify graph-click selection of up to three initial infected population locations, including selection, deselection, limit feedback, and consistent propagation into every fair strategy run.
+- [x] Add deterministic dashboard logic coverage or documented verification for initial-infection selection behavior and its rerun effects.
+- [x] Fix the explanation/report request payload so it stays within the server-side input limit and explanation generation succeeds for normal scenarios.
+- [x] Improve bounded real-road import defaults and guidance so ordinary neighborhood selections do not immediately exceed the node limit.
+- [x] Replace the crowded one-page workflow with a clear top-ribbon simulator flow for city setup, outbreak assumptions, symptom evidence, intervention limits, network exploration, outcomes, and strategy comparison.
+- [x] Add concise inline definitions, lower/upper bounds, and practical effect descriptions for city seed, districts, road density, transmission rate, recovery rate, mortality rate, symptom evidence, and intervention budgets.
+- [x] Move the infections-over-time and cumulative-outcomes charts into a dedicated outcomes view and give the fair strategy scorecard its own focused comparison view.
+- [x] Reduce repetitive academic disclaimers while retaining one appropriately placed scenario-model notice.
+- [x] Enlarge the network into a dedicated interactive exploration view with clearer visual hierarchy, full-size canvas controls, and a 2D/3D presentation toggle.
+- [x] Allow user-selected road closures and location quarantines to re-run the scenario and update relevant outcomes in the simulator.
+- [x] Add an interactive sensitivity-analysis view with relevant parameter relationship charts, animated sweeps, and plain-language interpretations of transmission, recovery, mortality, and strategy performance.
+- [x] Add tests and desktop visual verification for the revised workflow, payload-size fix, manual interventions, and sensitivity-analysis calculations.
+- [x] Consolidate the redesigned workspace to one primary academic scenario-model notice and soften duplicate disclaimer copy.
+- [x] Add focused guided-workflow verification evidence for ribbon view switching and section rendering.
+- [x] Add manual-intervention coverage for location quarantine recalculation and empty population-location behavior.
+- [x] Audit the final workspace for duplicate disclaimer-style notices and document the single retained primary scenario-model notice.
+- [x] Rephrase the remaining header and recommendation context labels so the footer is the only primary scenario-model notice, then re-audit the simulator copy.
+- [x] Define a transparent five-scenario demonstration protocol that keeps each comparison fair and explains why a particular strategy wins under that scenario's assumptions.
+- [x] Search the bounded real-road graph configuration space and verify five reproducible presets in which Random, Highest Degree, Betweenness, Dijkstra Blocking, and Max-Flow/Min-Cut each win at least once.
+- [x] Add named, documented demonstration presets with fixed graph inputs, outbreak settings, starting infections, budgets, selected strategy outcome, and reproducible seeds.
+- [x] Add a visible Demonstration Mode control that walks the presenter through all five verified scenarios with clear next/previous controls and a concise explanation of the winning method.
+- [x] Improve the interactive 3D city-block network with cinematic lighting, terrain, roads, buildings, depth cues, and restrained environmental detail while retaining graph readability.
+- [x] Add tests for preset reproducibility, claimed winner validation, and guided-demo navigation, plus desktop visual verification of the 3D view and demonstration controls.
+- [x] Detect tied strategy outcomes and present them as an inconclusive comparison rather than defaulting to Random selection as a unique winner.
+- [x] Add an opt-in live-road reproduction test that imports each curated demo preset and verifies its claimed strategy outcome against the current bounded public road graph.
+- [x] Add static rendering and shared-controller coverage for the Demonstration Mode panel, and record each final preset configuration in verification evidence.
+- [x] Persist deterministic bounded road-graph fixtures for the two demonstration maps and verify every stored preset outcome without contacting a live map service.
+- [x] Add direct interaction coverage that invokes Demonstration Mode load, previous, next, and close callbacks with the expected arguments.
+- [x] Add a rendered-button interaction test that clicks Demonstration Mode load, previous, next, and exit controls and verifies callback arguments.
+- [x] Add a clearly labeled one-click reset that restores the standard synthetic demonstration scenario and clears temporary manual interventions and evidence.
+- [x] Add a client-side CSV export for the current fair strategy comparison, including outcome metrics, budget use, and selected intervention actions.
+- [x] Add a concise presenter script covering setup, fair comparison, Bayesian evidence, manual what-if actions, sensitivity analysis, and all five Demonstration Mode scenarios.
+- [x] Add tests and desktop verification for the reset and CSV export controls, then update the presentation handoff documentation.
+- [x] Add a Bayesian symptom-evidence and hotspot-scoring explanation to the presenter script.
+- [x] Add direct rendered control interaction coverage for the Reset and CSV buttons, including expected reset state and download behavior.
+- [x] Record and re-verify the reset, CSV, and presenter-notes implementation in the project verification documentation.
+- [x] Add a stateful rendered Reset-button test that proves a changed workspace state is restored to the standard teaching scenario after click.
+- [x] Extract the actual simulator reset state into a shared controller and verify it restores synthetic settings, evidence, manual actions, imported-road mode, and documented transient state.
+- [ ] Export the validated project source to a private GitHub repository with a clean commit and confirm the remote URL.
+- [x] Provide a Windows-from-scratch Git and GitHub CLI guide for creating the private repository and uploading the project source.
+- [x] Assess the current 3D graph against a higher-fidelity miniature-city presentation while preserving clear graph and intervention readability.
+- [x] Implement and verify any selected 3D map improvements before completing the GitHub export.
+- [x] Align the 320-node real-road import limit across the browser input, tRPC validation, importer normalization, and a focused contract test.

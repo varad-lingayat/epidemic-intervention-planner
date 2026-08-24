@@ -1,12 +1,50 @@
 import type { CityGraph, CityNode, EpidemicState, InterventionAction, SimulationSnapshot } from "@shared/epidemic";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
-import { useMemo, useRef, useState } from "react";
+import React, { Component, type ReactNode, useMemo, useRef, useState } from "react";
 import { facilityRoofColor, getBuildingProfile, type BuildingProfile } from "./networkGraph3DModel";
+import { NetworkGraph } from "./NetworkGraph";
 
 const stateColors: Record<EpidemicState, string> = { susceptible: "#a8bcc9", infected: "#fb7185", recovered: "#45c6ed", deceased: "#64748b", quarantined: "#c084fc" };
 type NetworkGraph3DProps = { graph: CityGraph; snapshot?: SimulationSnapshot; actions?: InterventionAction[]; initialInfectedNodeIds?: string[]; onNodeClick?: (nodeId: string) => void };
 type Position3 = readonly [number, number, number];
+
+function supportsWebGL() {
+  if (typeof document === "undefined") return false;
+  try {
+    const canvas = document.createElement("canvas");
+    return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+
+class WebGLSceneBoundary extends Component<{ onFailure: () => void; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch() {
+    this.props.onFailure();
+  }
+
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
+function WebGLFallback({ props, onRetry }: { props: NetworkGraph3DProps; onRetry: () => void }) {
+  return <div className="relative h-full min-h-[540px] overflow-hidden rounded-[1.35rem] border border-cyan-300/25 bg-[#07131e] shadow-[0_24px_70px_rgba(6,28,43,.38)]">
+    <NetworkGraph {...props} />
+    <div className="absolute right-4 top-4 max-w-[300px] rounded-xl border border-amber-200/30 bg-slate-950/88 px-3.5 py-3 text-[11px] leading-4 text-slate-100 shadow-xl backdrop-blur-md">
+      <p className="font-bold uppercase tracking-[0.12em] text-amber-200">3D graphics fallback active</p>
+      <p className="mt-1.5 text-slate-300">This computer did not provide a usable WebGL canvas. The same interactive graph, states, road closures, and selections remain available in 2D.</p>
+      <button type="button" onClick={onRetry} className="mt-2 rounded-lg border border-amber-200/30 bg-amber-200/10 px-2.5 py-1 text-[10px] font-semibold text-amber-100 transition hover:bg-amber-200/20">Retry 3D graphics</button>
+    </div>
+  </div>;
+}
 
 function normaliseGraph(graph: CityGraph) {
   const points = graph.nodes.map(node => node.position);
@@ -122,8 +160,8 @@ function NetworkScene({ graph, snapshot, actions = [], initialInfectedNodeIds = 
   const quarantinedNodeIds = useMemo(() => new Set(actions.flatMap(action => action.kind === "quarantine_node" ? [action.nodeId] : action.kind === "isolate_block" ? action.nodeIds : [])), [actions]);
   return <>
     <color attach="background" args={["#07131e"]} /><fog attach="fog" args={["#07131e", 12, 24]} />
-    <Stars radius={90} depth={40} count={800} factor={1.5} saturation={0} fade speed={0.13} />
-    <ambientLight intensity={0.42} color="#b9dff2" /><hemisphereLight args={["#75c5f3", "#0a1c28", 1.28]} /><directionalLight position={[-7, 12, -6]} intensity={2.7} color="#ffe2ba" castShadow shadow-mapSize={[1024, 1024]} /><directionalLight position={[6, 6, 7]} intensity={0.6} color="#71c7ff" />
+    <Stars radius={90} depth={40} count={360} factor={1.35} saturation={0} fade speed={0.08} />
+    <ambientLight intensity={0.42} color="#b9dff2" /><hemisphereLight args={["#75c5f3", "#0a1c28", 1.28]} /><directionalLight position={[-7, 12, -6]} intensity={2.7} color="#ffe2ba" castShadow shadow-mapSize={[512, 512]} /><directionalLight position={[6, 6, 7]} intensity={0.6} color="#71c7ff" />
     <DistrictLights graph={graph} positions={positions} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.09, 0]}><planeGeometry args={[18.7, 18.7]} /><meshStandardMaterial color="#122e36" roughness={0.92} metalness={0.06} /></mesh>
     <mesh position={[0, -0.045, 0]} receiveShadow><boxGeometry args={[14.8, 0.08, 14.8]} /><meshStandardMaterial color="#183f43" roughness={0.86} metalness={0.12} /></mesh>
@@ -135,6 +173,10 @@ function NetworkScene({ graph, snapshot, actions = [], initialInfectedNodeIds = 
 }
 
 export function NetworkGraph3D(props: NetworkGraph3DProps) {
+  const [webglEnabled, setWebglEnabled] = useState(supportsWebGL);
   if (!props.graph.nodes.length) return null;
-  return <div className="relative h-full min-h-[540px] overflow-hidden rounded-[1.35rem] border border-cyan-300/25 bg-[#07131e] shadow-[0_24px_70px_rgba(6,28,43,.38)]"><Canvas shadows dpr={[1, 1.5]} camera={{ position: [8.25, 8.1, 9.1], fov: 39 }}><NetworkScene {...props} /></Canvas><div className="pointer-events-none absolute left-4 top-4 max-w-[350px] rounded-xl border border-cyan-200/20 bg-slate-950/74 px-3.5 py-3 text-[10px] leading-4 text-slate-100 shadow-xl backdrop-blur-md"><p className="font-bold uppercase tracking-[0.15em] text-cyan-200">Architectural miniature city network</p><p className="mt-1.5 text-slate-300">A tabletop city model with readable graph corridors: building form shows facility type, height reflects modeled population, and glowing structures show the active epidemic state.</p></div><div className="pointer-events-none absolute bottom-4 left-4 flex flex-wrap gap-2 rounded-xl border border-white/10 bg-slate-950/74 px-3 py-2 text-[10px] font-medium text-slate-100 shadow-lg backdrop-blur-md"><span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-rose-400" /> infected glow</span><span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-cyan-400" /> recovered</span><span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-violet-400" /> quarantine fence</span><span><i className="mr-1 inline-block h-0.5 w-3 bg-orange-400" /> road barrier</span></div></div>;
+  const enableFallback = () => setWebglEnabled(false);
+  const retryWebGL = () => setWebglEnabled(supportsWebGL());
+  if (!webglEnabled) return <WebGLFallback props={props} onRetry={retryWebGL} />;
+  return <div className="relative h-full min-h-[540px] overflow-hidden rounded-[1.35rem] border border-cyan-300/25 bg-[#07131e] shadow-[0_24px_70px_rgba(6,28,43,.38)]"><WebGLSceneBoundary onFailure={enableFallback}><Canvas shadows="basic" dpr={[1, 1.25]} gl={{ powerPreference: "high-performance", antialias: true, failIfMajorPerformanceCaveat: false }} camera={{ position: [8.25, 8.1, 9.1], fov: 39 }} onCreated={({ gl }) => { const context = gl.getContext(); if (context.isContextLost()) enableFallback(); gl.domElement.addEventListener("webglcontextlost", enableFallback, { once: true }); }}><NetworkScene {...props} /></Canvas></WebGLSceneBoundary><div className="pointer-events-none absolute left-4 top-4 max-w-[350px] rounded-xl border border-cyan-200/20 bg-slate-950/74 px-3.5 py-3 text-[10px] leading-4 text-slate-100 shadow-xl backdrop-blur-md"><p className="font-bold uppercase tracking-[0.15em] text-cyan-200">Architectural miniature city network</p><p className="mt-1.5 text-slate-300">A tabletop city model with readable graph corridors: building form shows facility type, height reflects modeled population, and glowing structures show the active epidemic state.</p></div><div className="pointer-events-none absolute bottom-4 left-4 flex flex-wrap gap-2 rounded-xl border border-white/10 bg-slate-950/74 px-3 py-2 text-[10px] font-medium text-slate-100 shadow-lg backdrop-blur-md"><span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-rose-400" /> infected glow</span><span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-cyan-400" /> recovered</span><span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-violet-400" /> quarantine fence</span><span><i className="mr-1 inline-block h-0.5 w-3 bg-orange-400" /> road barrier</span></div></div>;
 }

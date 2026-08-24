@@ -1,0 +1,10 @@
+{
+  "entry": "main.typ",
+  "metadata": {
+    "author": "Varad Lingayat",
+    "subtitle": "Comprehensive Technical, Mathematical, and Decision Review",
+    "title": "EpiGraph Epidemic Intervention Planner"
+  },
+  "mode": "report",
+  "theme": "report-theme.typ"
+}

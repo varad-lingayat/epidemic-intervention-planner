@@ -31,7 +31,7 @@ export const STANDARD_REAL_ROAD_CONFIG = {
   includeFootways: false,
 };
 
-export function createStandardPresentationScenario() {
+function buildStandardPresentationScenario() {
   const graph = createSyntheticCityGraph(STANDARD_SYNTHETIC_SETTINGS);
   const initialNodeId = graph.nodes.find(node => node.population > 0)?.id ?? graph.nodes[0]?.id ?? "";
   const parameters: EpidemicParameters = {
@@ -51,6 +51,18 @@ export function createStandardPresentationScenario() {
     evidence: [],
   });
   return { graph, parameters, budget: STANDARD_INTERVENTION_BUDGET, comparison };
+}
+
+let standardPresentationScenario: ReturnType<typeof buildStandardPresentationScenario> | undefined;
+
+/**
+ * Builds the deterministic teaching scenario once per renderer/server process.
+ * The graph and comparison are immutable inputs in the workspace, so reuse avoids
+ * repeating five simulations during initial render and ordinary Reset actions.
+ */
+export function createStandardPresentationScenario() {
+  standardPresentationScenario ??= buildStandardPresentationScenario();
+  return standardPresentationScenario;
 }
 
 /** The exact values restored by the visible workspace Reset control. */

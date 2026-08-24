@@ -87,8 +87,28 @@
 - [x] Record and re-verify the reset, CSV, and presenter-notes implementation in the project verification documentation.
 - [x] Add a stateful rendered Reset-button test that proves a changed workspace state is restored to the standard teaching scenario after click.
 - [x] Extract the actual simulator reset state into a shared controller and verify it restores synthetic settings, evidence, manual actions, imported-road mode, and documented transient state.
-- [ ] Export the validated project source to a private GitHub repository with a clean commit and confirm the remote URL.
+- [x] Export the validated project source to a private GitHub repository with a clean commit and confirm the remote URL.
 - [x] Provide a Windows-from-scratch Git and GitHub CLI guide for creating the private repository and uploading the project source.
 - [x] Assess the current 3D graph against a higher-fidelity miniature-city presentation while preserving clear graph and intervention readability.
 - [x] Implement and verify any selected 3D map improvements before completing the GitHub export.
 - [x] Align the 320-node real-road import limit across the browser input, tRPC validation, importer normalization, and a focused contract test.
+- [x] Assess the full-stack simulator's runtime dependencies and define a truthful Windows portable-package support boundary.
+- [x] Implement a Windows desktop launcher and portable packaging configuration for the validated simulator.
+- [x] Build, validate, and document the Windows portable package, including any online-only capability limitations.
+- [x] Remove the Vite development-only module from the portable production bundle and rebuild the replacement executable.
+- [x] Confirm the rebuilt replacement portable executable starts successfully on a Windows computer before closing the runtime repair.
+- [x] Make portable Demonstration Mode load all curated bundled road-graph fixtures without a live OpenStreetMap request, then rebuild and verify the replacement executable.
+- [ ] Confirm that the final fixture-backed portable replacement opens a curated Demonstration Mode scenario successfully on Windows.
+- [x] Inventory automated test coverage and add regression tests for untested high-risk simulator, importer, export, and desktop-runtime boundaries.
+- [x] Exercise valid, boundary, and invalid inputs across every editable simulator field and verify clear recovery behavior.
+- [x] Exercise all visible workspace controls, graph interactions, intervention actions, guided demonstrations, report/share actions, and export actions in representative state combinations.
+- [x] Review core desktop views in light/dark mode for visual defects, console errors, layout instability, and interaction feedback; apply focused polish fixes.
+- [x] Run the full validation suite and record tested scope and external-service constraints for the quality-assured release.
+- [x] Save the quality-assured source checkpoint after the complete validation suite passes.
+- [x] Build and deliver a final Windows portable executable from the latest quality-assured source, with offline demonstrations and all current fixes bundled.
+- [ ] Confirm that the final desktop executable opens a curated Demonstration Mode scenario successfully on Windows.
+- [x] Produce a comprehensive long-form academic technical review documenting implementation decisions, alternatives, validation evidence, mathematical models, algorithmic derivations, assumptions, and limitations for the completed project.
+- [x] Profile and optimize the portable desktop application’s startup path, initial rendering, and interaction responsiveness; rebuild and validate a faster replacement executable.
+- [x] Configure, build, and validate a Debian-compatible desktop package from the optimized offline application.
+- [ ] Prepare and push the complete current reproducible source, Windows and Debian packaging files, documentation, fixtures, tests, and validation notes to the private GitHub repository while excluding generated release artifacts.
+- [x] Repair the Linux desktop 3D network view so it renders reliably on the target Linux VM, then rebuild and validate a corrected Debian package.

@@ -28,36 +28,41 @@ export function sensitivityValues(parameter: SensitivityParameter, currentValue:
   });
 }
 
-/** Runs the same city, seed, initial infections, and budget at nearby values of one assumption. */
-export function buildSensitivityAnalysis(input: {
+export type SensitivityAnalysisInput = {
   graph: CityGraph;
   parameters: EpidemicParameters;
   budget: InterventionBudget;
   evidence?: SymptomEvidence[];
   parameter: SensitivityParameter;
-}): SensitivityPoint[] {
-  return sensitivityValues(input.parameter, input.parameters[input.parameter]).map(value => {
-    const parameters = { ...input.parameters, [input.parameter]: value };
-    const comparison = runFairStrategyComparison({
-      id: `sensitivity-${input.parameter}-${value}`,
-      title: `${input.graph.name} sensitivity analysis`,
-      graph: input.graph,
-      parameters,
-      budget: input.budget,
-      evidence: input.evidence,
-    });
-    const strategyFinalInfections = {} as Record<StrategyName, number>;
-    const strategyModeledDeaths = {} as Record<StrategyName, number>;
-    comparison.outcomes.forEach(outcome => {
-      strategyFinalInfections[outcome.strategy] = outcome.finalInfectedPopulation;
-      strategyModeledDeaths[outcome.strategy] = outcome.finalMortalityPopulation;
-    });
-    return {
-      value,
-      label: `${Math.round(value * 100)}%`,
-      winningStrategy: comparison.winningStrategy,
-      strategyFinalInfections,
-      strategyModeledDeaths,
-    };
+};
+
+/** Computes one fair comparison point, allowing UI callers to schedule a long sweep incrementally. */
+export function buildSensitivityPoint(input: SensitivityAnalysisInput, value: number): SensitivityPoint {
+  const parameters = { ...input.parameters, [input.parameter]: value };
+  const comparison = runFairStrategyComparison({
+    id: `sensitivity-${input.parameter}-${value}`,
+    title: `${input.graph.name} sensitivity analysis`,
+    graph: input.graph,
+    parameters,
+    budget: input.budget,
+    evidence: input.evidence,
   });
+  const strategyFinalInfections = {} as Record<StrategyName, number>;
+  const strategyModeledDeaths = {} as Record<StrategyName, number>;
+  comparison.outcomes.forEach(outcome => {
+    strategyFinalInfections[outcome.strategy] = outcome.finalInfectedPopulation;
+    strategyModeledDeaths[outcome.strategy] = outcome.finalMortalityPopulation;
+  });
+  return {
+    value,
+    label: `${Math.round(value * 100)}%`,
+    winningStrategy: comparison.winningStrategy,
+    strategyFinalInfections,
+    strategyModeledDeaths,
+  };
+}
+
+/** Runs the same city, seed, initial infections, and budget at nearby values of one assumption. */
+export function buildSensitivityAnalysis(input: SensitivityAnalysisInput): SensitivityPoint[] {
+  return sensitivityValues(input.parameter, input.parameters[input.parameter]).map(value => buildSensitivityPoint(input, value));
 }

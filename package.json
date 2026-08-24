@@ -1,8 +1,19 @@
 {
   "name": "epidemic-intervention-planner",
   "version": "1.0.0",
+  "description": "Academic epidemic intervention simulator for graph-theory teaching scenarios.",
+  "author": "Varad Lingayat",
+  "homepage": "https://github.com/varad-lingayat/epidemic-intervention-planner",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/varad-lingayat/epidemic-intervention-planner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/varad-lingayat/epidemic-intervention-planner/issues"
+  },
   "type": "module",
   "license": "MIT",
+  "main": "desktop/main.cjs",
   "scripts": {
     "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
     "build": "vite build && esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
@@ -10,7 +21,10 @@
     "check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
-    "db:push": "drizzle-kit generate && drizzle-kit migrate"
+    "db:push": "drizzle-kit generate && drizzle-kit migrate",
+    "desktop:run": "pnpm build && electron desktop/main.cjs",
+    "desktop:portable": "pnpm build && node scripts/prepare-desktop-runtime.mjs && pnpm --dir desktop-runtime install --prod --ignore-scripts && electron-builder --win portable --x64 --publish never",
+    "desktop:deb": "pnpm build && node scripts/prepare-desktop-runtime.mjs && pnpm --dir desktop-runtime install --prod --ignore-scripts && electron-builder --linux deb --x64 --publish never"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
@@ -98,6 +112,8 @@
     "add": "^2.0.6",
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.31.4",
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3",
     "esbuild": "^0.25.0",
     "jsdom": "^30.0.1",
     "pnpm": "^10.15.1",
@@ -110,6 +126,55 @@
     "vite": "^7.1.7",
     "vite-plugin-manus-runtime": "0.0.59",
     "vitest": "^2.1.4"
+  },
+  "build": {
+    "appId": "com.varadlingayat.epigraph",
+    "productName": "EpiGraph Epidemic Intervention Planner",
+    "asar": true,
+    "asarUnpack": [
+      "dist/public/**"
+    ],
+    "publish": null,
+    "compression": "store",
+    "electronLanguages": [
+      "en-US"
+    ],
+    "directories": {
+      "app": "desktop-runtime",
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "desktop/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "EpiGraph-Epidemic-Intervention-Planner-${version}-portable.${ext}"
+    },
+    "portable": {
+      "useZip": true
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Education",
+      "maintainer": "Varad Lingayat",
+      "artifactName": "EpiGraph-Epidemic-Intervention-Planner-${version}-linux-${arch}.${ext}"
+    }
   },
   "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af",
   "pnpm": {

@@ -10,6 +10,13 @@ describe("presentation finishing tools", () => {
     expect(standard.budget).toEqual(STANDARD_INTERVENTION_BUDGET);
   });
 
+  it("reuses the immutable standard scenario instead of rerunning five strategies for every startup or reset", () => {
+    const first = createStandardPresentationScenario();
+    const second = createStandardPresentationScenario();
+    expect(second).toBe(first);
+    expect(second.comparison).toBe(first.comparison);
+  });
+
   it("exports each fair strategy with metrics, budget use, and selected actions", () => {
     const csv = buildStrategyComparisonCsv(createStandardPresentationScenario().comparison);
     expect(csv.split("\n")).toHaveLength(6);

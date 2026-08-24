@@ -3,10 +3,28 @@ import fs from "fs";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
 import path from "path";
-import { createServer as createViteServer } from "vite";
-import viteConfig from "../../vite.config";
+import { pathToFileURL } from "url";
 
 export async function setupVite(app: Express, server: Server) {
+  // Keep Vite and its configuration behind runtime-only module specifiers. The
+  // production server bundle is reused by the portable desktop package, which
+  // deliberately excludes Vite and its development-only plugins.
+  const vitePackage = "vite";
+  const viteConfigUrl = pathToFileURL(
+    path.resolve(import.meta.dirname, "../..", "vite.config.ts")
+  ).href;
+  const [{ createServer: createViteServer }, { default: viteConfig }] = await Promise.all([
+    import(vitePackage),
+    import(viteConfigUrl),
+  ]);
+  const resolvedViteConfig = typeof viteConfig === "function"
+    ? viteConfig({
+      command: "serve",
+      mode: process.env.NODE_ENV === "production" ? "production" : "development",
+      isSsrBuild: false,
+      isPreview: false,
+    })
+    : viteConfig;
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
@@ -14,7 +32,7 @@ export async function setupVite(app: Express, server: Server) {
   };
 
   const vite = await createViteServer({
-    ...viteConfig,
+    ...resolvedViteConfig,
     configFile: false,
     server: serverOptions,
     appType: "custom",
@@ -48,8 +66,9 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath =
-    process.env.NODE_ENV === "development"
+  const distPath = process.env.EPIGRAPH_STATIC_DIR
+    ? path.resolve(process.env.EPIGRAPH_STATIC_DIR)
+    : process.env.NODE_ENV === "development"
       ? path.resolve(import.meta.dirname, "../..", "dist", "public")
       : path.resolve(import.meta.dirname, "public");
   if (!fs.existsSync(distPath)) {

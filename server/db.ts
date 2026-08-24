@@ -9,6 +9,16 @@ import {
   users,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import {
+  createLocalScenario,
+  createLocalScenarioReport,
+  getLocalScenario,
+  getLocalScenarioReport,
+  getLocalScenarioReportByShareId,
+  isDesktopStoreEnabled,
+  listLocalScenarios,
+  updateLocalScenarioComparison,
+} from "./desktopLocalStore";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -97,6 +107,7 @@ export async function getUserByOpenId(openId: string) {
 }
 
 export async function createScenario(scenario: InsertScenario) {
+  if (isDesktopStoreEnabled()) return createLocalScenario(scenario);
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable");
 
@@ -109,6 +120,10 @@ export async function updateScenarioComparison(
   ownerId: number,
   comparisonJson: string,
 ) {
+  if (isDesktopStoreEnabled()) {
+    await updateLocalScenarioComparison(scenarioId, ownerId, comparisonJson);
+    return;
+  }
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable");
 
@@ -119,6 +134,7 @@ export async function updateScenarioComparison(
 }
 
 export async function listScenariosForOwner(ownerId: number) {
+  if (isDesktopStoreEnabled()) return listLocalScenarios(ownerId);
   const db = await getDb();
   if (!db) return [];
 
@@ -130,6 +146,7 @@ export async function listScenariosForOwner(ownerId: number) {
 }
 
 export async function getScenarioForOwner(scenarioId: string, ownerId: number) {
+  if (isDesktopStoreEnabled()) return getLocalScenario(scenarioId, ownerId);
   const db = await getDb();
   if (!db) return undefined;
 
@@ -143,6 +160,7 @@ export async function getScenarioForOwner(scenarioId: string, ownerId: number) {
 }
 
 export async function createScenarioReport(report: InsertScenarioReport) {
+  if (isDesktopStoreEnabled()) return createLocalScenarioReport(report);
   const db = await getDb();
   if (!db) throw new Error("Database is unavailable");
 
@@ -151,6 +169,7 @@ export async function createScenarioReport(report: InsertScenarioReport) {
 }
 
 export async function getScenarioReportForOwner(reportId: string, ownerId: number) {
+  if (isDesktopStoreEnabled()) return getLocalScenarioReport(reportId, ownerId);
   const db = await getDb();
   if (!db) return undefined;
 
@@ -164,6 +183,7 @@ export async function getScenarioReportForOwner(reportId: string, ownerId: numbe
 }
 
 export async function getScenarioReportByShareId(shareId: string) {
+  if (isDesktopStoreEnabled()) return getLocalScenarioReportByShareId(shareId);
   const db = await getDb();
   if (!db) return undefined;
 

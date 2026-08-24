@@ -2,17 +2,19 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
+import { lazy, Suspense } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
-import SharedReport from "./pages/SharedReport";
+
+const SharedReport = lazy(() => import("./pages/SharedReport"));
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/share/:shareId"} component={SharedReport} />
+      <Route path={"/share/:shareId"}>{() => <Suspense fallback={<main className="grid min-h-screen place-items-center bg-slate-950 text-sm font-semibold text-slate-200">Loading shared scenario report…</main>}><SharedReport /></Suspense>}</Route>
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -11,6 +11,25 @@ export type TrpcContext = {
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
+  if (process.env.EPIGRAPH_DESKTOP_MODE === "true") {
+    const now = new Date();
+    return {
+      req: opts.req,
+      res: opts.res,
+      user: {
+        id: 0,
+        openId: "epigraph-desktop-user",
+        name: "Local desktop user",
+        email: null,
+        loginMethod: "desktop",
+        role: "user",
+        createdAt: now,
+        updatedAt: now,
+        lastSignedIn: now,
+      } satisfies User,
+    };
+  }
+
   let user: User | null = null;
 
   try {

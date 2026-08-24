@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createSyntheticCityGraph } from "../shared/epidemicEngine";
-import { buildSensitivityAnalysis, sensitivityValues } from "../shared/sensitivityAnalysis";
+import { buildSensitivityAnalysis, buildSensitivityPoint, sensitivityValues } from "../shared/sensitivityAnalysis";
 
 describe("sensitivity analysis", () => {
   const graph = createSyntheticCityGraph({
@@ -28,5 +28,12 @@ describe("sensitivity analysis", () => {
       expect(Object.keys(point.strategyFinalInfections)).toHaveLength(5);
       expect(point.winningStrategy).toBeDefined();
     });
+  });
+
+  it("computes an individual sweep point with the same complete five-strategy result contract", () => {
+    const point = buildSensitivityPoint({ graph, parameters, budget, parameter: "mortalityRate" }, 0.02);
+    expect(point.value).toBe(0.02);
+    expect(Object.keys(point.strategyFinalInfections)).toHaveLength(5);
+    expect(Object.keys(point.strategyModeledDeaths)).toHaveLength(5);
   });
 });

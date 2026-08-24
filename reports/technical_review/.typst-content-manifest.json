@@ -1,0 +1,11 @@
+{
+  "task_kind": "new-document",
+  "output": "pdf",
+  "signals": ["academic-report", "longform", "mathematical"],
+  "hard_constraints": ["approximately-100-pages", "technical-decision-register", "mathematical-derivations", "reference-style-citations"],
+  "content_features": {
+    "code_blocks": 12,
+    "defined_terms": 95,
+    "portrait_images": 0
+  }
+}
